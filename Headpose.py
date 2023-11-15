@@ -118,11 +118,8 @@ class HeadPose:
 cap= cv2.VideoCapture(0)
 last_gesture_time = time.time()
 no_movement_timer = 0
-gesture_printed=False
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
+while True:
+    ret, frame= cap.read()
 
     label = HeadPose.headpose(frame)
     print(label)
@@ -130,11 +127,9 @@ while cap.isOpened():
 
     cv2.imshow("Frame", frame)
     time_diff = time.time() - last_gesture_time
-
-    if time_diff > 3 and label in ['Yes', 'No'] and not gesture_printed:
-        print(label)
+    if time_diff > 3 and label in ['Yes', 'No']:
+        print("Resuming video playback...")
         last_gesture_time = time.time() 
-        gesture_printed = True
     if label == '':
         no_movement_timer += 1
     else:
@@ -144,25 +139,13 @@ while cap.isOpened():
         break
     if label == 'Yes' or label == 'No':
         last_gesture_time = time.time()  
+        print("Gesture detected. Pausing video for 3 seconds...")
+
     key=cv2.waitKey(1)
     if label== 'Yes' or label=='No':
-         break
+         continue
 
     if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
-    
-while cap.isOpened():
-    ret, frame = cap.read()
-
-    if not ret:
-        break  # Break if the video capture is not successful
-
-    label = HeadPose.headpose(frame)
-    cv2.putText(frame, "Headpose:" + str(label), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-    cv2.imshow("Frame", frame)
-
-    key = cv2.waitKey(1)
-    if key == ord("q"):
         break
     
 cap.release()
